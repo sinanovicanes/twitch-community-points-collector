@@ -1,11 +1,12 @@
 import { CollectedPointsStorage } from "@lib/storage";
+import { plurify } from "@lib/utils";
 
 async function fetchTwitchProfileImage(username: string): Promise<string> {
   try {
     const response = await fetch(`https://decapi.me/twitch/avatar/${username}`);
 
     if (!response.ok) {
-      return "default-avatar.png";
+      throw new Error(`Failed to fetch profile image for ${username}`);
     }
 
     return await response.text();
@@ -67,7 +68,7 @@ async function updateTotalPoints(): Promise<void> {
   // Multiply by 50 to simulate the points
   statsSpan.textContent = `${formatPoints(
     points * 50
-  )} points collected from ${streamersCount} streamers`;
+  )} points collected from ${streamersCount} ${plurify(streamersCount, "streamer")}`;
 }
 
 async function updateLeaderboard(): Promise<void> {
@@ -81,6 +82,7 @@ async function updateLeaderboard(): Promise<void> {
 
   if (leaderboard.length === 0) {
     leaderboardList.innerHTML = "<li>No data</li>";
+    setClearButtonState(false);
     return;
   }
 
@@ -91,10 +93,40 @@ async function updateLeaderboard(): Promise<void> {
     })
   );
 
+  setClearButtonState(true);
   leaderboardList.replaceChildren(...newChilds);
 }
 
+function initClearButton() {
+  const clearButton = document.getElementById("clear-btn");
+
+  if (!clearButton) {
+    return console.error("Clear button not found");
+  }
+
+  clearButton.addEventListener("click", async () => {
+    const confirmed = window.confirm("Are you sure you want to clear the leaderboard?");
+
+    if (!confirmed) return;
+
+    await CollectedPointsStorage.clear();
+    updateTotalPoints().catch(e => console.error(`Failed to update total points: ${e}`));
+    updateLeaderboard().catch(e => console.error(`Failed to update leaderboard: ${e}`));
+  });
+}
+
+async function setClearButtonState(enabled: boolean) {
+  const clearButton = document.getElementById("clear-btn");
+
+  if (!clearButton) {
+    return console.error("Clear button not found");
+  }
+
+  clearButton.style.display = enabled ? "block" : "none";
+}
+
 function main() {
+  initClearButton();
   updateTotalPoints().catch(e => console.error(`Failed to update total points: ${e}`));
   updateLeaderboard().catch(e => console.error(`Failed to update leaderboard: ${e}`));
 }

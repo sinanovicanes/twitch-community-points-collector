@@ -70,4 +70,8 @@ export class CollectedPointsStorage {
       [this.STORAGE_KEY]: collectedPoints
     });
   }
+
+  static async clear(): Promise<void> {
+    return chrome.storage.sync.remove(this.STORAGE_KEY);
+  }
 }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Twitch Channel Point Collector</title>
+  <title>Twitch Channel Points Collector</title>
   <script src="popup/index.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -58,6 +58,9 @@
     }
     .leaderboard {
       width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
     }
     .leaderboard h3 {
       margin-bottom: 0.5rem;
@@ -79,6 +82,28 @@
     .leaderboard li:last-child {
       border-bottom: none;
     }
+    .clear-btn {
+        background: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.9rem;
+        font-weight: bold;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.2s ease-in-out;
+        display: none;
+      }
+      .clear-btn:hover {
+        background: #cc0000;
+      }
+      .clear-btn img {
+        width: 16px;
+        height: 16px;
+      }
     footer {
       width: 100%;
       padding: 10px;
@@ -107,7 +132,7 @@
 <body>
   <div class="wrapper">
     <header>
-      Twitch Channel Point Collector
+      Twitch Channel Points Collector
     </header>
     <main>
       <div class="stats-wrapper"><span id="stats"></span></div>
@@ -120,6 +145,9 @@
           <li></li>
           <li></li>
         </ul>
+        <button id="clear-btn" class="clear-btn">
+          Clear Stats
+        </button>
       </section>
     </main>
     <footer>
