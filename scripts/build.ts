@@ -26,8 +26,8 @@ async function getScriptPathsFromDir(dir: string): Promise<string[]> {
 async function getEntryPoints(): Promise<string[]> {
   const backgroundScripts = await getScriptPathsFromDir("src/background");
   const contentScripts = await getScriptPathsFromDir("src/content_scripts");
-  const popup = await getScriptPathsFromDir("src/popup");
-  const entrypoints = ["src/index.ts", ...backgroundScripts, ...contentScripts, ...popup];
+  const src = await getScriptPathsFromDir("src");
+  const entrypoints = [...src, ...backgroundScripts, ...contentScripts];
 
   return entrypoints;
 }
