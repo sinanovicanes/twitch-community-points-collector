@@ -65,9 +65,9 @@ async function updateTotalPoints(): Promise<void> {
 
   const { points, streamersCount } = await CollectedPointsStorage.getStats();
   // Multiply by 50 to simulate the points
-  statsSpan.textContent = `Total points: ${formatPoints(
+  statsSpan.textContent = `${formatPoints(
     points * 50
-  )} from ${streamersCount} streamers`;
+  )} points collected from ${streamersCount} streamers`;
 }
 
 async function updateLeaderboard(): Promise<void> {

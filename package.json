@@ -1,5 +1,5 @@
 {
-  "name": "chrome-ext-ts",
+  "name": "twitch-channel-points-collector",
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
