@@ -36,7 +36,7 @@ function createLeaderBoardItem(
   anchor.style.textDecoration = "none";
 
   const pointsSpan = document.createElement("span");
-  pointsSpan.textContent = points.toString();
+  pointsSpan.textContent = formatPoints(points);
 
   li.style.display = "flex";
   li.style.alignItems = "center";
@@ -52,16 +52,22 @@ function createLeaderBoardItem(
   return li;
 }
 
-async function updateTotalPoints(): Promise<void> {
-  const totalPoints = document.getElementById("total-points");
+function formatPoints(points: number): string {
+  return points.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
 
-  if (!totalPoints) {
-    throw new Error("Total points span not found");
+async function updateTotalPoints(): Promise<void> {
+  const statsSpan = document.getElementById("stats");
+
+  if (!statsSpan) {
+    throw new Error("Stats span not found");
   }
 
-  const points = await CollectedPointsStorage.getTotalCollectedPoints();
+  const { points, streamersCount } = await CollectedPointsStorage.getStats();
   // Multiply by 50 to simulate the points
-  totalPoints.textContent = `Total collected points: ${points * 50}`;
+  statsSpan.textContent = `Total points: ${formatPoints(
+    points * 50
+  )} from ${streamersCount} streamers`;
 }
 
 async function updateLeaderboard(): Promise<void> {
@@ -71,7 +77,7 @@ async function updateLeaderboard(): Promise<void> {
     throw new Error("Leaderboard list not found");
   }
 
-  const leaderboard = await CollectedPointsStorage.getLeaderboard(10);
+  const leaderboard = await CollectedPointsStorage.getLeaderboard(5);
 
   if (leaderboard.length === 0) {
     leaderboardList.innerHTML = "<li>No data</li>";
@@ -79,10 +85,9 @@ async function updateLeaderboard(): Promise<void> {
   }
 
   const newChilds = await Promise.all(
-    leaderboard.map(async ([channel, count]) => {
+    leaderboard.map(async ([channel, points]) => {
       const profileImage = await fetchTwitchProfileImage(channel);
-      console.log(profileImage);
-      return createLeaderBoardItem(channel, count * 50, profileImage);
+      return createLeaderBoardItem(channel, points * 50, profileImage);
     })
   );
 

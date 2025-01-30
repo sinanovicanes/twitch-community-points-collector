@@ -16,6 +16,21 @@ export class CollectedPointsStorage {
     return Object.values(collectedPoints).reduce((a, b) => a + b, 0);
   }
 
+  static async getSteramersCount(): Promise<number> {
+    const collectedPoints = await this.getCollectedPoints();
+
+    return Object.keys(collectedPoints).length;
+  }
+
+  static async getStats(): Promise<{ points: number; streamersCount: number }> {
+    const collectedPoints = await this.getCollectedPoints();
+    const values = Object.values(collectedPoints);
+    const streamersCount = values.length;
+    const points = values.reduce((a, b) => a + b, 0);
+
+    return { points, streamersCount };
+  }
+
   static async getLeaderboard(maxEntries?: number): Promise<Array<[string, number]>> {
     const collectedPoints = await this.getCollectedPoints();
     const leaderboard = Object.entries(collectedPoints)
