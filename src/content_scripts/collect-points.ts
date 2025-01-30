@@ -59,7 +59,7 @@ function waitForElement<T extends Element>(
   });
 }
 
-async function main() {
+async function initCommunityPointsObserver(): Promise<() => void> {
   const communityPointsDiv = await waitForElement<HTMLDivElement>(
     ".community-points-summary",
     30 * 1000
@@ -71,44 +71,85 @@ async function main() {
 
   console.info("Community points div found, initializing observer");
 
-  // Selector of the button to collect points
-  const collectButtonSelector = ".hpBkMI";
+  let reAttachTimeout: Timer | null = null;
   const observer = new MutationObserver(
     async (mutations: MutationRecord[], observer: MutationObserver) => {
       console.log(
         "Mutation observed, disconnecting observer and waiting for 1s before re-attaching"
       );
 
-      // Disconnect observer to avoid multiple calls
       observer.disconnect();
 
-      // Wait for 1s before re-attaching observer and trying to collect points
-      setTimeout(async () => {
-        // Check if the collect button is available
-        const collectButton =
-          document.querySelector<HTMLButtonElement>(collectButtonSelector);
+      reAttachTimeout = setTimeout(async () => {
+        const collectButton = document.querySelector<HTMLButtonElement>(".hpBkMI");
 
-        // Collect points if the button is available
         if (collectButton) {
           await collectPoints(collectButton);
         }
 
-        // Re-attach observer to listen for further mutations
         observer.observe(communityPointsDiv, {
           childList: true,
           subtree: true,
           attributes: false
         });
         console.log("Observer re-attached");
+        reAttachTimeout = null;
       }, 1000);
     }
   );
 
-  // Start observing the community points div
   observer.observe(communityPointsDiv, {
     childList: true,
     subtree: true,
     attributes: false
+  });
+
+  const dispose = () => {
+    if (reAttachTimeout) {
+      clearTimeout(reAttachTimeout);
+    }
+    observer.disconnect();
+  };
+
+  return dispose;
+}
+
+async function main() {
+  let locationURL = window.location.href;
+  let communityPointsObserverDispose = await initCommunityPointsObserver().catch(
+    () => null
+  );
+
+  const windowLocationObserver = new MutationObserver(async (_, observer) => {
+    // Disconnect the observer to avoid infinite loop
+    observer.disconnect();
+
+    if (locationURL !== window.location.href) {
+      locationURL = window.location.href;
+      console.log("Location changed, re-create observer");
+
+      // Dispose the previous observer if exists on location change
+      if (communityPointsObserverDispose) {
+        communityPointsObserverDispose();
+      }
+
+      // Try to re-create the observer
+      communityPointsObserverDispose = await initCommunityPointsObserver().catch(
+        () => null
+      );
+    }
+
+    // Re-observe the window location
+    observer.observe(document, {
+      childList: true,
+      subtree: true
+    });
+  });
+
+  // Start observing the window location
+  windowLocationObserver.observe(document, {
+    childList: true,
+    subtree: true
   });
 }
 
