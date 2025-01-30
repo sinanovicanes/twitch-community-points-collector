@@ -10,13 +10,7 @@ async function collectPoints(collectButton: HTMLButtonElement) {
     console.log(`Collecting points for ${channel}`);
 
     collectButton.click();
-    const collectionCount = await CollectedPointsStorage.getCollectedPointsByChannel(
-      channel
-    );
-    await CollectedPointsStorage.setCollectedPointsByChannel(
-      channel,
-      collectionCount + 1
-    );
+    await CollectedPointsStorage.increaseCollectedPointsByChannel(channel);
   } catch (e) {
     console.error(`An error occurred while collecting points: ${e}`);
   }

@@ -57,4 +57,17 @@ export class CollectedPointsStorage {
       [this.STORAGE_KEY]: collectedPoints
     });
   }
+
+  static async increaseCollectedPointsByChannel(
+    channel: string,
+    amount = 1
+  ): Promise<void> {
+    const collectedPoints = await this.getCollectedPoints();
+    const count = isNaN(collectedPoints[channel]) ? 0 : collectedPoints[channel];
+    collectedPoints[channel] = count + amount;
+
+    return chrome.storage.sync.set({
+      [this.STORAGE_KEY]: collectedPoints
+    });
+  }
 }
