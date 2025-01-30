@@ -1,16 +1,16 @@
 import { Glob } from "bun";
-import { readdir, rmdir } from "fs/promises";
+import fs from "fs/promises";
 import path from "path";
 
 const OUTDIR = "dist";
 const PUBLICDIR = "public";
 
 async function clearOutdir() {
-  await rmdir(OUTDIR, { recursive: true }).catch(() => {});
+  await fs.rmdir(OUTDIR, { recursive: true }).catch(() => {});
 }
 
 async function getScriptPathsFromDir(dir: string): Promise<string[]> {
-  const files = await readdir(dir).catch(() => [] as string[]);
+  const files = await fs.readdir(dir).catch(() => [] as string[]);
   const allowedFiles = new Glob("*.{ts,tsx,js,jsx}");
   const paths = [];
 
@@ -48,12 +48,18 @@ async function build() {
 }
 
 async function copyPublicFiles() {
-  const files = await readdir(PUBLICDIR);
+  const files = await fs.readdir(PUBLICDIR);
 
   for (const fileName of files) {
     const filePath = path.join(PUBLICDIR, fileName);
     const newPath = path.join(OUTDIR, fileName);
     const file = Bun.file(filePath);
+    const stats = await file.stat();
+
+    if (stats.isDirectory()) {
+      fs.cp(filePath, newPath, { recursive: true });
+      continue;
+    }
 
     await Bun.write(newPath, file);
   }

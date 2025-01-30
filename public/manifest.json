@@ -5,10 +5,10 @@
   "manifest_version": 3,
   "permissions": ["storage"],
   "icons": {
-    "16": "extension_icon_16x16.png",
-    "32": "extension_icon_32x32.png",
-    "48": "extension_icon_48x48.png",
-    "128": "extension_icon_128x128.png"
+    "16": "assets/icons/extension_icon_16x16.png",
+    "32": "assets/icons/extension_icon_32x32.png",
+    "48": "assets/icons/extension_icon_48x48.png",
+    "128": "assets/icons/extension_icon_128x128.png"
   },
   "action": {
     "default_popup": "popup.html"
