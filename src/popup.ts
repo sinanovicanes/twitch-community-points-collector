@@ -57,6 +57,33 @@ function formatPoints(points: number): string {
   return points.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
+function initClearButton() {
+  const clearButton = document.getElementById("clear-btn");
+
+  if (!clearButton) {
+    return console.error("Clear button not found");
+  }
+
+  clearButton.addEventListener("click", async () => {
+    const confirmed = window.confirm("Are you sure you want to clear the leaderboard?");
+
+    if (!confirmed) return;
+
+    await CollectedPointsStorage.clear();
+    updateUI();
+  });
+}
+
+async function setClearButtonState(enabled: boolean) {
+  const clearButton = document.getElementById("clear-btn");
+
+  if (!clearButton) {
+    return console.error("Clear button not found");
+  }
+
+  clearButton.style.display = enabled ? "block" : "none";
+}
+
 async function updateTotalPoints(): Promise<void> {
   const statsSpan = document.getElementById("stats");
 
@@ -97,38 +124,27 @@ async function updateLeaderboard(): Promise<void> {
   leaderboardList.replaceChildren(...newChilds);
 }
 
-function initClearButton() {
-  const clearButton = document.getElementById("clear-btn");
+function updateVersion() {
+  const versionSpan = document.getElementById("version");
 
-  if (!clearButton) {
-    return console.error("Clear button not found");
+  if (!versionSpan) {
+    return console.error("Version span not found");
   }
 
-  clearButton.addEventListener("click", async () => {
-    const confirmed = window.confirm("Are you sure you want to clear the leaderboard?");
+  const currentVersion = chrome.runtime.getManifest().version;
 
-    if (!confirmed) return;
-
-    await CollectedPointsStorage.clear();
-    updateTotalPoints().catch(e => console.error(`Failed to update total points: ${e}`));
-    updateLeaderboard().catch(e => console.error(`Failed to update leaderboard: ${e}`));
-  });
+  versionSpan.textContent = `v${currentVersion}`;
 }
 
-async function setClearButtonState(enabled: boolean) {
-  const clearButton = document.getElementById("clear-btn");
-
-  if (!clearButton) {
-    return console.error("Clear button not found");
-  }
-
-  clearButton.style.display = enabled ? "block" : "none";
+function updateUI() {
+  updateTotalPoints().catch(e => console.error(`Failed to update total points: ${e}`));
+  updateLeaderboard().catch(e => console.error(`Failed to update leaderboard: ${e}`));
 }
 
 function main() {
   initClearButton();
-  updateTotalPoints().catch(e => console.error(`Failed to update total points: ${e}`));
-  updateLeaderboard().catch(e => console.error(`Failed to update leaderboard: ${e}`));
+  updateVersion();
+  updateUI();
 }
 
 document.addEventListener("DOMContentLoaded", main);

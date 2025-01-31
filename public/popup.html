@@ -111,9 +111,8 @@
       background: #ddd;
       font-size: 0.9rem;
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       align-items: center;
-      gap: 5px;
     }
     footer a {
       color: #9146FF;
@@ -126,6 +125,10 @@
     footer img {
       width: 24px;
       height: 24px;
+    }
+    footer .links {
+      display: flex;
+      gap: 5px;
     }
   </style>
 </head>
@@ -145,18 +148,25 @@
           <li></li>
           <li></li>
         </ul>
-        <button id="clear-btn" class="clear-btn">
+        <button id="clear-btn" class="clear-btn" onclick="clearLeaderboard()">
           Clear Stats
         </button>
       </section>
     </main>
     <footer>
-      <a href="https://github.com/sinanovicanes/twitch-community-points-collector" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub">
-      </a>
-      <a href="https://www.twitch.tv/sinanovicanes" target="_blank">
-        <img src="assets/images/twitch-icon.svg" alt="Twitch">
-      </a>
+      <section>
+        <span id="version">
+          v0.1.0
+        </span>
+      </section>
+      <section class="links">
+        <a href="https://github.com/sinanovicanes/twitch-community-points-collector" target="_blank">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub">
+        </a>
+        <a href="https://www.twitch.tv/sinanovicanes" target="_blank">
+          <img src="assets/images/twitch-icon.svg" alt="Twitch">
+        </a>
+      </section>
     </footer>
   </div>
 </body>
