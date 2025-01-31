@@ -1,6 +1,6 @@
 {
-  "name": "Twitch Point Collector",
-  "description": "Collects Twitch points for you",
+  "name": "Twitch Community Point Collector",
+  "description": "Collects Twitch community points for you.",
   "version": "0.1.0",
   "manifest_version": 3,
   "permissions": ["storage"],

@@ -1,5 +1,5 @@
 {
-  "name": "twitch-channel-points-collector",
+  "name": "twitch-community-points-collector",
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
