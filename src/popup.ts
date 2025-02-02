@@ -11,7 +11,7 @@ async function fetchTwitchProfileImage(username: string): Promise<string> {
 
     return await response.text();
   } catch {
-    return "default-avatar.png";
+    return "assets/images/default-avatar.png";
   }
 }
 

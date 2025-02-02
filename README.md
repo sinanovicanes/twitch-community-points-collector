@@ -8,7 +8,7 @@ A lightweight Chrome extension that automatically collects Twitch community poin
 - Automatically claims Twitch community points while you watch streams.
 - Tracks and displays a leaderboard based on collected points.
 - Shows total points collected from different channels.
-- Runs in the background with minimal resource usage.
+- Runs as a content script on Twitch pages.
 - No user interaction required—just install and enjoy!
 
 ## Installation
