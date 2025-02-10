@@ -1,3 +1,4 @@
+import { DelayedSingleMutationObserver } from "@lib/utils";
 import { CollectedPointsStorage } from "@lib/storage";
 
 function getCurrentChannelName(): string {
@@ -16,135 +17,37 @@ async function collectPoints(collectButton: HTMLButtonElement) {
   }
 }
 
-function waitForElement<T extends Element>(
-  selector: string,
-  timeout = 10000
-): Promise<T> {
-  return new Promise((_resolve, _reject) => {
-    let rejected = false;
-
-    const reject = (reason: any) => {
-      rejected = true;
-      _reject(reason);
-    };
-
-    const timeoutId = setTimeout(() => {
-      reject(new Error(`Timeout: Element ${selector} not found`));
-    }, timeout);
-
-    const resolve = (value: T) => {
-      clearTimeout(timeoutId);
-      _resolve(value);
-    };
-
-    const check = () => {
-      if (rejected) return;
-
-      const element = document.querySelector<T>(selector);
-
-      if (element) {
-        return resolve(element);
-      }
-
-      requestAnimationFrame(check);
-    };
-
-    check();
-  });
-}
-
-async function initCommunityPointsObserver(): Promise<() => void> {
-  const communityPointsDiv = await waitForElement<HTMLDivElement>(
-    ".community-points-summary",
-    30 * 1000
-  );
-
-  if (!communityPointsDiv) {
-    throw new Error("Community points div is not found");
-  }
-
-  console.info("Community points div found, initializing observer");
-
-  let reAttachTimeout: Timer | null = null;
-  const observer = new MutationObserver(
-    async (mutations: MutationRecord[], observer: MutationObserver) => {
-      console.log(
-        "Mutation observed, disconnecting observer and waiting for 1s before re-attaching"
-      );
-
-      observer.disconnect();
-
-      reAttachTimeout = setTimeout(async () => {
-        const collectButton = document.querySelector<HTMLButtonElement>(".hpBkMI");
-
-        if (collectButton) {
-          await collectPoints(collectButton);
-        }
-
-        observer.observe(communityPointsDiv, {
-          childList: true,
-          subtree: true,
-          attributes: false
-        });
-        console.log("Observer re-attached");
-        reAttachTimeout = null;
-      }, 1000);
-    }
-  );
-
-  observer.observe(communityPointsDiv, {
-    childList: true,
-    subtree: true,
-    attributes: false
-  });
-
-  const dispose = () => {
-    if (reAttachTimeout) {
-      clearTimeout(reAttachTimeout);
-    }
-    observer.disconnect();
-  };
-
-  return dispose;
-}
-
 async function main() {
-  let locationURL = window.location.href;
-  let communityPointsObserverDispose = await initCommunityPointsObserver().catch(
-    () => null
-  );
-
-  const windowLocationObserver = new MutationObserver(async (_, observer) => {
-    // Disconnect the observer to avoid infinite loop
-    observer.disconnect();
-
-    if (locationURL !== window.location.href) {
-      locationURL = window.location.href;
-      console.log("Location changed, re-create observer");
-
-      // Dispose the previous observer if exists on location change
-      if (communityPointsObserverDispose) {
-        communityPointsObserverDispose();
-      }
-
-      // Try to re-create the observer
-      communityPointsObserverDispose = await initCommunityPointsObserver().catch(
-        () => null
-      );
-    }
-
-    // Re-observe the window location
-    observer.observe(document, {
-      childList: true,
-      subtree: true
-    });
-  });
-
-  // Start observing the window location
-  windowLocationObserver.observe(document, {
+  const communityPointsDivSelector = ".community-points-summary";
+  const collectButtonSelector = ".hpBkMI";
+  const options: MutationObserverInit = {
     childList: true,
     subtree: true
-  });
+  };
+
+  const communityPointsObserver = new DelayedSingleMutationObserver(async () => {
+    const collectButton =
+      document.querySelector<HTMLButtonElement>(collectButtonSelector);
+
+    if (collectButton) {
+      await collectPoints(collectButton);
+    }
+  }, 1000);
+
+  const bodyObserver = new DelayedSingleMutationObserver(() => {
+    const communityPointsDiv = document.querySelector<HTMLDivElement>(
+      communityPointsDivSelector
+    );
+
+    // If the community points div is not found, disconnect the observer
+    if (!communityPointsDiv) {
+      communityPointsObserver.disconnect();
+    } else {
+      communityPointsObserver.observe(communityPointsDiv, options);
+    }
+  }, 5000);
+
+  bodyObserver.observe(document.body, options);
 }
 
 main().catch(err => {

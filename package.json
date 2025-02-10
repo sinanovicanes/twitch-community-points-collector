@@ -7,12 +7,7 @@
     "watch": "bun run scripts/watch.ts"
   },
   "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "dependencies": {
-    "@types/chrome": "^0.0.299"
+    "@types/bun": "latest",
+    "@types/chrome": "0.0.304"
   }
 }
