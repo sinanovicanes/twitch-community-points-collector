@@ -17,22 +17,26 @@ async function collectPoints(collectButton: HTMLButtonElement) {
   }
 }
 
+async function controlAndCollectPoints() {
+  const collectButtonSelector = ".hpBkMI";
+  const collectButton = document.querySelector<HTMLButtonElement>(collectButtonSelector);
+
+  if (collectButton) {
+    await collectPoints(collectButton);
+  }
+}
+
 async function main() {
   const communityPointsDivSelector = ".community-points-summary";
-  const collectButtonSelector = ".hpBkMI";
   const options: MutationObserverInit = {
     childList: true,
     subtree: true
   };
 
-  const communityPointsObserver = new DelayedSingleMutationObserver(async () => {
-    const collectButton =
-      document.querySelector<HTMLButtonElement>(collectButtonSelector);
-
-    if (collectButton) {
-      await collectPoints(collectButton);
-    }
-  }, 1000);
+  const communityPointsObserver = new DelayedSingleMutationObserver(
+    controlAndCollectPoints,
+    1000
+  );
 
   const bodyObserver = new DelayedSingleMutationObserver(() => {
     const communityPointsDiv = document.querySelector<HTMLDivElement>(
@@ -48,6 +52,9 @@ async function main() {
   }, 5000);
 
   bodyObserver.observe(document.body, options);
+
+  // Initial control and collect points
+  setTimeout(controlAndCollectPoints, 1000);
 }
 
 main().catch(err => {
