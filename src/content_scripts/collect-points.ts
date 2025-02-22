@@ -1,4 +1,3 @@
-import { DelayedSingleMutationObserver } from "@lib/utils";
 import { CollectedPointsStorage } from "@lib/storage";
 
 function getCurrentChannelName(): string {
@@ -27,34 +26,11 @@ async function controlAndCollectPoints() {
 }
 
 async function main() {
-  const communityPointsDivSelector = ".community-points-summary";
-  const options: MutationObserverInit = {
-    childList: true,
-    subtree: true
-  };
-
-  const communityPointsObserver = new DelayedSingleMutationObserver(
-    controlAndCollectPoints,
-    1000
-  );
-
-  const bodyObserver = new DelayedSingleMutationObserver(() => {
-    const communityPointsDiv = document.querySelector<HTMLDivElement>(
-      communityPointsDivSelector
+  setInterval(() => {
+    controlAndCollectPoints().catch(e =>
+      console.error(`An error occurred while controlling and collecting points: ${e}`)
     );
-
-    // If the community points div is not found, disconnect the observer
-    if (!communityPointsDiv) {
-      communityPointsObserver.disconnect();
-    } else {
-      communityPointsObserver.observe(communityPointsDiv, options);
-    }
-  }, 5000);
-
-  bodyObserver.observe(document.body, options);
-
-  // Initial control and collect points
-  setTimeout(controlAndCollectPoints, 1000);
+  }, 1000);
 }
 
 main().catch(err => {
