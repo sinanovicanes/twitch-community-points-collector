@@ -17,7 +17,7 @@ async function collectPoints(collectButton: HTMLButtonElement) {
 }
 
 async function controlAndCollectPoints() {
-  const collectButtonSelector = ".hpBkMI";
+  const collectButtonSelector = ".cdqvHM";
   const collectButton = document.querySelector<HTMLButtonElement>(collectButtonSelector);
 
   if (collectButton) {
