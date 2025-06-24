@@ -1,7 +1,7 @@
 {
   "name": "Twitch Community Points Collector",
   "description": "Collects Twitch community points for you.",
-  "version": "0.1.23",
+  "version": "0.1.24",
   "manifest_version": 3,
   "permissions": ["storage"],
   "icons": {
