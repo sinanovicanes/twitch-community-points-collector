@@ -24,12 +24,13 @@ async function getScriptPathsFromDir(dir: string): Promise<string[]> {
 }
 
 async function getEntryPoints(): Promise<string[]> {
-  const backgroundScripts = await getScriptPathsFromDir("src/background");
-  const contentScripts = await getScriptPathsFromDir("src/content_scripts");
-  const src = await getScriptPathsFromDir("src");
-  const entrypoints = [...src, ...backgroundScripts, ...contentScripts];
+  const entrypoints = await Promise.all([
+    getScriptPathsFromDir("src"),
+    getScriptPathsFromDir("src/background"),
+    getScriptPathsFromDir("src/content_scripts")
+  ]);
 
-  return entrypoints;
+  return entrypoints.flat();
 }
 
 async function build() {
